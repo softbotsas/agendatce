@@ -1,0 +1,6 @@
+# Proyecto: TCE Nómina multinacional (Node + Express + Mongoose + EJS)
+- Seguir arquitectura modular: src/models, src/controlls, src/router, services.
+- No exponer secretos; usar .env y .env.example.
+- Estándar de código: Node LTS, CommonJS, async/await, validación básica.
+- EJS como motor de vistas con componentes parciales en /views/templantes.
+- Objetivo: Nómina por sectores (empresa-país), moneda propia, horarios, feriados, marcajes, timesheets, recibos y reportes.
