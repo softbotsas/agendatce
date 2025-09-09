@@ -1,6 +1,7 @@
 const express = require('express');
 const http = require('http');
 const session = require('express-session');
+const flash = require('express-flash');
 const morgan = require('morgan');
 const cors = require('cors');
 const methodOverride = require('method-override');
@@ -42,6 +43,9 @@ app.use(session({
   }
 }));
 
+// Flash messages
+app.use(flash());
+
 // Exponer sesión en vistas (como ya usas)
 app.use((req, res, next) => {
   res.locals.session = req.session || {};
@@ -52,6 +56,7 @@ app.use((req, res, next) => {
 app.use((req, res, next) => { req.io = io; next(); });
 
 // Rutas (ajusta si tus carpetas están en raíz)
+app.use('/', require('./src/router/auth.router')); 
 app.use('/', require('./src/router/nomina.router')); 
 app.get('/', (req,res)=> res.render('home', { titulo: 'Inicio' }));
 
