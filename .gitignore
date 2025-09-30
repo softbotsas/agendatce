@@ -15,8 +15,14 @@ yarn-error.log*
 logs
 *.log
 
+# Archivos de sesión y cookies
+sessions/
+cookies/
+cookies-*.txt
+
 # Archivos de prueba y scripts temporales
 test-*.js
+test-*.html
 debug-*.js
 *-test.js
 create-*.js
@@ -26,10 +32,17 @@ migrate-*.js
 verify-*.js
 assign-*.js
 simple-*.js
+backup-*.js
 
-# Archivos de sesión y cookies
-sessions/
-cookies/
+# Documentación adicional (mantener solo README.md y DOCUMENTACION_TECNICA_AGENDA.md)
+AGENDA_SYSTEM.md
+COMANDOS_UTILES.md
+GUIA_*.md
+INTEGRACION_*.md
+PROBLEMAS_*.md
+PROGRESO_*.md
+RESUMEN_*.md
+SETUP_INICIAL.md
 
 # Archivos temporales del sistema
 .DS_Store
@@ -60,3 +73,7 @@ Thumbs.db
 # Archivos de build (si los hay)
 dist/
 build/
+
+# Archivos CSV de importación
+*.csv
+
