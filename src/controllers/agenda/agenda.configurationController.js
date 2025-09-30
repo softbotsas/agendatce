@@ -31,12 +31,12 @@ const getEmployees = async (req, res) => {
   }
 };
 
-// Crear nuevo empleado
+// Crear nuevo empleado con enlace al sistema principal
 const createEmployee = async (req, res) => {
   try {
     console.log('➕ createEmployee - Datos recibidos:', JSON.stringify(req.body, null, 2));
     
-    const { name, correo, perfil_usuario, departamento, cargo, activo } = req.body;
+    const { name, correo, perfil_usuario, departamento, cargo, activo, system_user_id } = req.body;
     
     console.log('🔍 Validando campos:');
     console.log('  - name:', name, '(tipo:', typeof name, ')');
@@ -45,6 +45,7 @@ const createEmployee = async (req, res) => {
     console.log('  - departamento:', departamento, '(tipo:', typeof departamento, ')');
     console.log('  - cargo:', cargo, '(tipo:', typeof cargo, ')');
     console.log('  - activo:', activo, '(tipo:', typeof activo, ')');
+    console.log('  - system_user_id:', system_user_id, '(tipo:', typeof system_user_id, ')');
     
     // Validar datos requeridos
     if (!name || !correo || !perfil_usuario || !departamento) {
@@ -65,21 +66,51 @@ const createEmployee = async (req, res) => {
         }
       });
     }
-    
-    // Crear empleado usando el servicio
-    const newEmployee = await agendaUserService.createUser({
-      name,
-      correo,
-      perfil_usuario: parseInt(perfil_usuario),
-      departamento,
-      cargo: cargo || '',
-      activo: activo !== undefined ? activo : true
-    });
+
+    let newEmployee;
+
+    // Si se proporciona system_user_id, crear con enlace
+    if (system_user_id && system_user_id !== '') {
+      console.log('🔗 Creando usuario de agenda con enlace al sistema principal...');
+      
+      const agendaUserData = {
+        nombre: name,
+        email: correo,
+        perfil_usuario: parseInt(perfil_usuario),
+        departamento,
+        departamento_name: departamento, // Usar el mismo valor por ahora
+        cargo: cargo || '',
+        activo: activo !== undefined ? activo : true
+      };
+
+      const result = await agendaUserService.createAgendaUserWithLink(agendaUserData, system_user_id);
+      
+      if (!result.success) {
+        return res.status(400).json({
+          success: false,
+          message: result.message || 'Error al crear usuario con enlace'
+        });
+      }
+
+      newEmployee = result.data;
+    } else {
+      console.log('👤 Creando usuario de agenda independiente...');
+      
+      // Crear empleado sin enlace usando el servicio tradicional
+      newEmployee = await agendaUserService.createUser({
+        name,
+        correo,
+        perfil_usuario: parseInt(perfil_usuario),
+        departamento,
+        cargo: cargo || '',
+        activo: activo !== undefined ? activo : true
+      });
+    }
     
     res.json({
       success: true,
       data: newEmployee,
-      message: 'Empleado creado exitosamente'
+      message: system_user_id ? 'Empleado creado con enlace al sistema principal' : 'Empleado creado exitosamente'
     });
   } catch (error) {
     console.error('Error en createEmployee:', error);

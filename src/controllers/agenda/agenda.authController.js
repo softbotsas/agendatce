@@ -1,40 +1,38 @@
-// Controlador de autenticación para desarrollo
-// TODO: Reemplazar con autenticación real del sistema principal
+// Controlador de autenticación integrado con sistema principal
+// Usa req.session.userId del sistema principal
 
 const UserService = require('../../services/agenda/agenda.userService');
 
-// Simular login (solo para desarrollo)
-const simulateLogin = async (req, res) => {
+// Verificar sesión del sistema principal
+const checkSession = async (req, res) => {
   try {
-    const { userId } = req.body;
-    
-    if (!userId) {
-      return res.status(400).json({
+    // El sistema principal ya estableció req.session.userId
+    if (!req.session || !req.session.userId) {
+      return res.status(401).json({
         success: false,
-        message: 'ID de usuario requerido'
+        message: 'No hay sesión activa en el sistema principal'
       });
     }
 
-    // Verificar que el usuario existe
-    const userResult = await UserService.getUserById(userId);
+    // Buscar el usuario de agenda vinculado al usuario del sistema principal
+    const userResult = await UserService.getUserBySystemUserId(req.session.userId);
     
     if (!userResult.success) {
       return res.status(404).json({
         success: false,
-        message: 'Usuario no encontrado'
+        message: 'Usuario de agenda no encontrado para este usuario del sistema',
+        systemUserId: req.session.userId
       });
     }
 
-    // Establecer sesión
-    req.session.userId = userId;
-    
     res.json({
       success: true,
-      message: 'Sesión iniciada correctamente',
-      user: userResult.data
+      message: 'Sesión válida',
+      user: userResult.data,
+      systemUserId: req.session.userId
     });
   } catch (error) {
-    console.error('Error in simulateLogin:', error);
+    console.error('Error in checkSession:', error);
     res.status(500).json({
       success: false,
       message: 'Error interno del servidor'
@@ -67,27 +65,33 @@ const logout = async (req, res) => {
   }
 };
 
-// Obtener usuario actual
+// Obtener usuario actual desde el sistema principal
 const getCurrentUser = async (req, res) => {
   try {
+    // El sistema principal ya estableció req.session.userId
     if (!req.session || !req.session.userId) {
       return res.status(401).json({
         success: false,
-        message: 'No hay sesión activa'
+        message: 'No hay sesión activa en el sistema principal'
       });
     }
 
-    const userResult = await UserService.getUserById(req.session.userId);
+    // Buscar el usuario de agenda vinculado al usuario del sistema principal
+    const userResult = await UserService.getUserBySystemUserId(req.session.userId);
     
     if (!userResult.success) {
       return res.status(404).json({
         success: false,
-        message: 'Usuario no encontrado'
+        message: 'Usuario de agenda no encontrado para este usuario del sistema',
+        systemUserId: req.session.userId
       });
     }
 
-    console.log('🔍 getCurrentUser - userResult completo:', JSON.stringify(userResult, null, 2));
-    console.log('🔍 getCurrentUser - userResult.data:', JSON.stringify(userResult.data, null, 2));
+    console.log('🔍 getCurrentUser - Usuario encontrado:', {
+      systemUserId: req.session.userId,
+      agendaUserId: userResult.data._id,
+      nombre: userResult.data.nombre
+    });
     
     res.json({
       success: true,
@@ -102,12 +106,12 @@ const getCurrentUser = async (req, res) => {
   }
 };
 
-// Obtener usuarios disponibles para login (solo para desarrollo)
+// Obtener usuarios del sistema principal para enlace con agenda
 const getAvailableUsers = async (req, res) => {
   try {
-    console.log('🔍 getAvailableUsers - Iniciando...');
+    console.log('🔍 getAvailableUsers - Obteniendo usuarios del sistema principal...');
     
-    const usersResult = await UserService.getAllUsers();
+    const usersResult = await UserService.getSystemUsers();
     console.log('🔍 getAvailableUsers - usersResult:', {
       success: usersResult.success,
       dataLength: usersResult.data ? usersResult.data.length : 'undefined',
@@ -127,29 +131,31 @@ const getAvailableUsers = async (req, res) => {
       });
     }
 
-    // Filtrar información sensible
-    console.log('🔍 getAvailableUsers - Mapeando usuarios...');
+    // Filtrar información sensible y mostrar solo usuarios sin enlace a agenda
+    console.log('🔍 getAvailableUsers - Mapeando usuarios del sistema...');
     const safeUsers = usersResult.data.map((user, index) => {
-      console.log(`🔍 Usuario ${index + 1}:`, {
+      console.log(`🔍 Usuario del sistema ${index + 1}:`, {
         _id: user._id,
         name: user.name,
-        nombre: user.nombre,
         correo: user.correo,
-        perfil_usuario: user.perfil_usuario
+        perfil_usuario: user.perfil_usuario,
+        agenda_user: user.agenda_user
       });
       
       return {
         _id: user._id,
-        name: user.name || user.nombre || 'Usuario Sin Nombre', // Usar name primero, luego nombre como fallback
+        name: user.name || 'Usuario Sin Nombre',
         correo: user.correo || 'sin-email@tce.com',
         perfil_usuario: user.perfil_usuario || 3,
         cargo: user.cargo || 'Sin cargo',
         role_name: user.perfil_usuario === 1 ? 'Admin' : 
-                   user.perfil_usuario === 2 ? 'Supervisor' : 'Empleado'
+                   user.perfil_usuario === 2 ? 'Supervisor' : 'Empleado',
+        has_agenda_link: !!user.agenda_user,
+        agenda_user_id: user.agenda_user
       };
     });
 
-    console.log('✅ getAvailableUsers - Usuarios mapeados exitosamente:', safeUsers.length);
+    console.log('✅ getAvailableUsers - Usuarios del sistema mapeados exitosamente:', safeUsers.length);
     
     res.json({
       success: true,
@@ -167,7 +173,7 @@ const getAvailableUsers = async (req, res) => {
 };
 
 module.exports = {
-  simulateLogin,
+  checkSession,
   logout,
   getCurrentUser,
   getAvailableUsers

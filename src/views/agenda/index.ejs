@@ -3691,9 +3691,52 @@
         }
 
         // Funciones de modales
-        function showAddEmployeeModal() {
+        async function showAddEmployeeModal() {
+            // Cargar usuarios del sistema principal
+            await loadSystemUsers();
+            
             const modal = new bootstrap.Modal(document.getElementById('addEmployeeModal'));
             modal.show();
+        }
+
+        async function loadSystemUsers() {
+            try {
+                const response = await fetch('/agenda/auth/available-users', {
+                    credentials: 'include'
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    const systemUsersSelect = document.getElementById('employeeSystemUser');
+                    
+                    // Limpiar opciones existentes
+                    systemUsersSelect.innerHTML = '<option value="">Sin enlace (usuario independiente)</option>';
+                    
+                    if (result.success && result.data) {
+                        // Filtrar usuarios que no tengan enlace con agenda
+                        const availableUsers = result.data.filter(user => !user.has_agenda_link);
+                        
+                        availableUsers.forEach(user => {
+                            const option = document.createElement('option');
+                            option.value = user._id;
+                            option.textContent = `${user.name} (${user.correo}) - ${user.role_name}`;
+                            systemUsersSelect.appendChild(option);
+                        });
+                        
+                        if (availableUsers.length === 0) {
+                            const option = document.createElement('option');
+                            option.value = '';
+                            option.textContent = 'No hay usuarios disponibles para enlace';
+                            option.disabled = true;
+                            systemUsersSelect.appendChild(option);
+                        }
+                    }
+                } else {
+                    console.error('Error cargando usuarios del sistema:', response.status);
+                }
+            } catch (error) {
+                console.error('Error cargando usuarios del sistema:', error);
+            }
         }
 
         function saveEmployee() {
@@ -3703,6 +3746,7 @@
                 perfil_usuario: parseInt(document.getElementById('employeeRole').value),
                 cargo: document.getElementById('employeePosition').value,
                 departamento: document.getElementById('employeeDepartment').value,
+                system_user_id: document.getElementById('employeeSystemUser').value,
                 activo: true
             };
             

@@ -258,9 +258,6 @@ Guía rápida para desarrolladores con comandos esenciales, checklist de desarro
 4. Push a la rama (`git push origin feature/NuevaFuncionalidad`)
 5. Abre un Pull Request
 
-## 📄 Licencia
-
-Este proyecto está bajo la Licencia MIT - ver el archivo [LICENSE](LICENSE) para detalles.
 
 ## 👨‍💻 Autor
 
@@ -273,5 +270,3 @@ Este proyecto está bajo la Licencia MIT - ver el archivo [LICENSE](LICENSE) par
 **⚠️ RECORDATORIO: Este es un Sistema de Agenda/Checklist, NO un sistema de nómina.**
 
 **📅 Última actualización**: Septiembre 2025
-
-Desarrollado con ❤️ para el seguimiento eficiente de tareas operativas.

@@ -78,7 +78,7 @@ const authenticateToken = (req, res, next) => {
 router.get('/agenda/login', (req, res) => {
     res.render('agenda/login', { titulo: 'Login - Sistema de Agenda TCE' });
 });
-router.post('/agenda/auth/login', agendaAuthController.simulateLogin);
+router.post('/agenda/auth/check-session', agendaAuthController.checkSession);
 router.post('/agenda/auth/logout', agendaAuthController.logout);
 router.get('/agenda/auth/current-user', authenticateToken, agendaAuthController.getCurrentUser);
 router.get('/agenda/api/user/current', authenticateToken, agendaAuthController.getCurrentUser);

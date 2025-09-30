@@ -203,9 +203,26 @@
             </div>
           </div>
           
-          <div class="mb-3">
-            <label for="employeePosition" class="form-label">Cargo</label>
-            <input type="text" class="form-control" id="employeePosition">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="employeePosition" class="form-label">Cargo</label>
+                <input type="text" class="form-control" id="employeePosition">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="employeeSystemUser" class="form-label">Enlazar con Usuario del Sistema</label>
+                <select class="form-select" id="employeeSystemUser">
+                  <option value="">Sin enlace (usuario independiente)</option>
+                  <option value="">Cargando usuarios del sistema...</option>
+                </select>
+                <div class="form-text">
+                  <i class="fas fa-info-circle me-1"></i>
+                  Selecciona un usuario del sistema principal para crear el enlace
+                </div>
+              </div>
+            </div>
           </div>
         </form>
       </div>

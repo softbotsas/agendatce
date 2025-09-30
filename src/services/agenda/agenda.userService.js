@@ -702,6 +702,145 @@ const getUserByIdForEdit = async (userId) => {
   }
 };
 
+// Obtener usuario de agenda por ID del sistema principal
+const getUserBySystemUserId = async (systemUserId) => {
+  try {
+    console.log('🔍 getUserBySystemUserId - systemUserId:', systemUserId);
+    
+    const User = require('../../models/agenda.User');
+    const agendaUser = await User.findOne({ user_id: systemUserId });
+    
+    if (!agendaUser) {
+      console.log('⚠️ Usuario de agenda no encontrado para systemUserId:', systemUserId);
+      return {
+        success: false,
+        message: 'Usuario de agenda no encontrado para este usuario del sistema'
+      };
+    }
+
+    console.log('✅ Usuario de agenda encontrado:', agendaUser.nombre);
+    
+    // Mapear a la estructura esperada
+    const mappedUser = {
+      _id: agendaUser._id,
+      name: agendaUser.nombre || 'Usuario Sin Nombre',
+      nombre: agendaUser.nombre || 'Usuario Sin Nombre',
+      correo: agendaUser.email || 'sin-email@tce.com',
+      perfil_usuario: agendaUser.perfil_usuario !== undefined ? agendaUser.perfil_usuario : 3,
+      cargo: agendaUser.cargo || 'Sin cargo',
+      departamento: agendaUser.departamento || 'Sin departamento',
+      departamento_name: agendaUser.departamento_name || 'Sin departamento',
+      activo: agendaUser.activo !== undefined ? agendaUser.activo : true,
+      user_id: agendaUser.user_id,
+      color: agendaUser.color,
+      notificaciones: agendaUser.notificaciones
+    };
+    
+    // Agregar información de rol
+    const roleInfo = getUserRole(mappedUser.perfil_usuario);
+    mappedUser.role_name = roleInfo.name;
+    mappedUser.role_permissions = roleInfo.permissions;
+    
+    return {
+      success: true,
+      data: mappedUser
+    };
+  } catch (error) {
+    console.error('❌ Error getting agenda user by system user ID:', error);
+    return {
+      success: false,
+      message: 'Error al obtener usuario de agenda'
+    };
+  }
+};
+
+// Obtener usuarios del sistema principal
+const getSystemUsers = async () => {
+  try {
+    console.log('🔍 getSystemUsers - Obteniendo usuarios del sistema principal...');
+    
+    const User = require('../../models/Users'); // Modelo del sistema principal
+    const systemUsers = await User.find({ activo: true });
+    
+    console.log('✅ Usuarios del sistema encontrados:', systemUsers.length);
+    
+    return {
+      success: true,
+      data: systemUsers
+    };
+  } catch (error) {
+    console.error('❌ Error getting system users:', error);
+    return {
+      success: false,
+      message: 'Error al obtener usuarios del sistema principal'
+    };
+  }
+};
+
+// Crear usuario de agenda con enlace al sistema principal
+const createAgendaUserWithLink = async (agendaUserData, systemUserId) => {
+  try {
+    console.log('🔗 createAgendaUserWithLink - Datos:', agendaUserData, 'systemUserId:', systemUserId);
+    
+    const User = require('../../models/agenda.User');
+    
+    const newAgendaUserData = {
+      nombre: agendaUserData.nombre,
+      email: agendaUserData.email,
+      user_id: systemUserId, // Enlace al usuario del sistema principal
+      perfil_usuario: agendaUserData.perfil_usuario,
+      cargo: agendaUserData.cargo || '',
+      departamento: agendaUserData.departamento,
+      departamento_name: agendaUserData.departamento_name,
+      activo: agendaUserData.activo !== undefined ? agendaUserData.activo : true,
+      color: agendaUserData.color || '#007bff',
+      notificaciones: agendaUserData.notificaciones || {
+        email: true,
+        whatsapp: false,
+        recordatorios_sla: true
+      }
+    };
+    
+    const savedAgendaUser = await User.create(newAgendaUserData);
+    console.log('✅ Usuario de agenda creado con enlace:', savedAgendaUser._id);
+    
+    // Actualizar el usuario del sistema principal con el enlace
+    const SystemUser = require('../../models/Users');
+    await SystemUser.findByIdAndUpdate(systemUserId, {
+      agenda_user: savedAgendaUser._id
+    });
+    
+    console.log('✅ Enlace bidireccional establecido');
+    
+    // Mapear a la estructura esperada
+    const mappedUser = {
+      _id: savedAgendaUser._id,
+      name: savedAgendaUser.nombre,
+      nombre: savedAgendaUser.nombre,
+      correo: savedAgendaUser.email,
+      perfil_usuario: savedAgendaUser.perfil_usuario,
+      cargo: savedAgendaUser.cargo,
+      departamento: savedAgendaUser.departamento,
+      departamento_name: savedAgendaUser.departamento_name,
+      activo: savedAgendaUser.activo,
+      user_id: savedAgendaUser.user_id,
+      color: savedAgendaUser.color,
+      notificaciones: savedAgendaUser.notificaciones
+    };
+    
+    return {
+      success: true,
+      data: mappedUser
+    };
+  } catch (error) {
+    console.error('❌ Error creating agenda user with link:', error);
+    return {
+      success: false,
+      message: 'Error al crear usuario de agenda con enlace'
+    };
+  }
+};
+
 module.exports = {
   getUserById,
   getUserRole,
@@ -718,5 +857,8 @@ module.exports = {
   deleteUser,
   getUserByIdForEdit,
   getAllDepartments,
-  createDepartment
+  createDepartment,
+  getUserBySystemUserId,
+  getSystemUsers,
+  createAgendaUserWithLink
 };
