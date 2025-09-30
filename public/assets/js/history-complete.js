@@ -419,98 +419,98 @@ function viewActivityDetails(activityId) {
   const activity = historyData.find(a => a._id === activityId);
   if (!activity) return;
   
-  // Crear modal dinámicamente
-  const modalHtml = `
-    <div class="modal fade" id="activityDetailModal" tabindex="-1">
-      <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">Detalles de la Actividad</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+  // Usar el modal estático de history.ejs
+  const modal = new bootstrap.Modal(document.getElementById('activityDetailModal'));
+  const modalBody = document.querySelector('#activityDetailModal .modal-body');
+  
+  modalBody.innerHTML = `
+    <div class="row">
+      <div class="col-md-6">
+        <h6>Información General</h6>
+        <p><strong>Tarea:</strong> ${activity.task_title || 'Sin título'}</p>
+        <p><strong>Usuario:</strong> ${activity.user_name || 'Desconocido'}</p>
+        <p><strong>Acción:</strong> ${getActionText(activity.action_type)}</p>
+        <p><strong>Fecha:</strong> ${new Date(activity.created_at).toLocaleString('es-ES')}</p>
+        ${activity.value ? `<p><strong>Valor:</strong> ${activity.value}</p>` : ''}
+      </div>
+      <div class="col-md-6">
+        <h6>Comentarios</h6>
+        <p>${activity.comment || 'Sin comentarios'}</p>
+        ${activity.evidence && activity.evidence.length > 0 ? `
+          <h6>Evidencias</h6>
+          <div class="d-flex flex-wrap gap-2">
+            ${activity.evidence.map(ev => `
+              <button class="btn btn-sm btn-outline-primary" onclick="viewEvidence('${ev.url}', '${ev.original_name || ev.filename}')">
+                <i class="fas fa-paperclip me-1"></i>${ev.original_name || ev.filename}
+              </button>
+            `).join('')}
           </div>
-          <div class="modal-body">
-            <div class="row">
-              <div class="col-md-6">
-                <h6>Información General</h6>
-                <p><strong>Tarea:</strong> ${activity.task_title || 'Sin título'}</p>
-                <p><strong>Usuario:</strong> ${activity.user_name || 'Desconocido'}</p>
-                <p><strong>Acción:</strong> ${getActionText(activity.action_type)}</p>
-                <p><strong>Fecha:</strong> ${new Date(activity.created_at).toLocaleString('es-ES')}</p>
-              </div>
-              <div class="col-md-6">
-                <h6>Comentarios</h6>
-                <p>${activity.comment || 'Sin comentarios'}</p>
-                ${activity.evidence && activity.evidence.length > 0 ? `
-                  <h6>Evidencias</h6>
-                  ${activity.evidence.map(ev => `
-                    <button class="btn btn-sm btn-outline-primary me-2 mb-2" onclick="viewEvidence('${ev.url}', '${ev.original_name || ev.filename}')">
-                      <i class="fas fa-paperclip me-1"></i>${ev.original_name || ev.filename}
-                    </button>
-                  `).join('')}
-                ` : ''}
-              </div>
-            </div>
-          </div>
-        </div>
+        ` : ''}
       </div>
     </div>
   `;
   
-  // Remover modal existente si existe
-  const existingModal = document.getElementById('activityDetailModal');
-  if (existingModal) {
-    existingModal.remove();
-  }
-  
-  // Agregar nuevo modal
-  document.body.insertAdjacentHTML('beforeend', modalHtml);
-  
-  // Mostrar modal
-  const modal = new bootstrap.Modal(document.getElementById('activityDetailModal'));
   modal.show();
 }
 
 function viewEvidence(url, filename) {
   if (!url || !filename) return;
   
-  // Crear modal para mostrar evidencia
-  const modalHtml = `
-    <div class="modal fade" id="evidenceModal" tabindex="-1">
-      <div class="modal-dialog modal-xl">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">${filename}</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-          </div>
-          <div class="modal-body text-center">
-            ${isImageFile(filename) ? 
-              `<img src="${url}" class="img-fluid" alt="${filename}">` :
-              `<div class="alert alert-info">
-                <i class="fas fa-file me-2"></i>
-                Archivo: ${filename}
-                <br><br>
-                <a href="${url}" class="btn btn-primary" download="${filename}">
-                  <i class="fas fa-download me-1"></i>Descargar archivo
-                </a>
-              </div>`
-            }
-          </div>
+  // Usar el modal estático de history.ejs
+  const modal = new bootstrap.Modal(document.getElementById('evidenceModal'));
+  const modalBody = document.querySelector('#evidenceModal .modal-body');
+  const modalTitle = document.querySelector('#evidenceModal .modal-title');
+  
+  modalTitle.textContent = filename;
+  
+  if (isImageFile(filename)) {
+    modalBody.innerHTML = `
+      <div class="text-center">
+        <div class="mb-3">
+          <button class="btn btn-sm btn-outline-secondary me-2" onclick="zoomImage('in')">
+            <i class="fas fa-search-plus"></i> Zoom In
+          </button>
+          <button class="btn btn-sm btn-outline-secondary me-2" onclick="zoomImage('out')">
+            <i class="fas fa-search-minus"></i> Zoom Out
+          </button>
+          <button class="btn btn-sm btn-outline-secondary me-2" onclick="resetImageZoom()">
+            <i class="fas fa-expand-arrows-alt"></i> Reset
+          </button>
+          <a href="${url}" class="btn btn-sm btn-primary" download="${filename}">
+            <i class="fas fa-download"></i> Descargar
+          </a>
+        </div>
+        <div class="image-container" style="max-height: 70vh; overflow: auto; border: 1px solid #dee2e6; border-radius: 8px; background: #f8f9fa;">
+          <img id="evidenceImage" src="${url}" class="img-fluid" alt="${filename}" style="transition: transform 0.3s ease; cursor: zoom-in;" onclick="toggleImageZoom()">
+        </div>
+        <div class="mt-2">
+          <small class="text-muted">
+            <i class="fas fa-info-circle me-1"></i>
+            Haz clic en la imagen para hacer zoom
+          </small>
         </div>
       </div>
-    </div>
-  `;
-  
-  // Remover modal existente si existe
-  const existingModal = document.getElementById('evidenceModal');
-  if (existingModal) {
-    existingModal.remove();
+    `;
+  } else {
+    modalBody.innerHTML = `
+      <div class="text-center">
+        <div class="mb-4">
+          <i class="fas fa-file fa-4x text-muted mb-3"></i>
+          <h5>${filename}</h5>
+          <p class="text-muted">Archivo adjunto</p>
+        </div>
+        <div class="d-grid gap-2 d-md-block">
+          <a href="${url}" class="btn btn-primary" download="${filename}">
+            <i class="fas fa-download me-2"></i>Descargar archivo
+          </a>
+          <button class="btn btn-outline-secondary" data-bs-dismiss="modal">
+            <i class="fas fa-times me-2"></i>Cerrar
+          </button>
+        </div>
+      </div>
+    `;
   }
   
-  // Agregar nuevo modal
-  document.body.insertAdjacentHTML('beforeend', modalHtml);
-  
-  // Mostrar modal
-  const modal = new bootstrap.Modal(document.getElementById('evidenceModal'));
   modal.show();
 }
 
@@ -531,6 +531,61 @@ function isImageFile(filename) {
   const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp'];
   const ext = filename.toLowerCase().substring(filename.lastIndexOf('.'));
   return imageExtensions.includes(ext);
+}
+
+// Variables para control de zoom de imagen
+let currentZoom = 1;
+const ZOOM_STEP = 0.2;
+const MAX_ZOOM = 3;
+const MIN_ZOOM = 0.5;
+
+function zoomImage(direction) {
+  const img = document.getElementById('evidenceImage');
+  if (!img) return;
+  
+  if (direction === 'in') {
+    currentZoom = Math.min(currentZoom + ZOOM_STEP, MAX_ZOOM);
+  } else if (direction === 'out') {
+    currentZoom = Math.max(currentZoom - ZOOM_STEP, MIN_ZOOM);
+  }
+  
+  img.style.transform = `scale(${currentZoom})`;
+  updateZoomButtons();
+}
+
+function resetImageZoom() {
+  currentZoom = 1;
+  const img = document.getElementById('evidenceImage');
+  if (img) {
+    img.style.transform = 'scale(1)';
+  }
+  updateZoomButtons();
+}
+
+function toggleImageZoom() {
+  const img = document.getElementById('evidenceImage');
+  if (!img) return;
+  
+  if (currentZoom === 1) {
+    currentZoom = 2;
+  } else {
+    currentZoom = 1;
+  }
+  
+  img.style.transform = `scale(${currentZoom})`;
+  updateZoomButtons();
+}
+
+function updateZoomButtons() {
+  const zoomInBtn = document.querySelector('button[onclick="zoomImage(\'in\')"]');
+  const zoomOutBtn = document.querySelector('button[onclick="zoomImage(\'out\')"]');
+  
+  if (zoomInBtn) {
+    zoomInBtn.disabled = currentZoom >= MAX_ZOOM;
+  }
+  if (zoomOutBtn) {
+    zoomOutBtn.disabled = currentZoom <= MIN_ZOOM;
+  }
 }
 
 function showHistoryError(message) {
