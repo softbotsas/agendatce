@@ -1,8 +1,6 @@
 # Sistema de Agenda TCE - Checklist para Líderes
 
-**⚠️ IMPORTANTE: Este NO es un sistema de nómina. Es un sistema de agenda/checklist para el seguimiento de tareas diarias.**
-
-Sistema de checklist y seguimiento de tareas desarrollado con Node.js, Express, Mongoose y EJS para Laisa y Alejandra.
+Sistema de checklist y seguimiento de tareas desarrollado con Node.js, Express, Mongoose y EJS
 
 ## 🎯 Objetivo del Sistema
 

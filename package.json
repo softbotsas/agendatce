@@ -5,6 +5,7 @@
   "scripts": {
     "start": "node app.js",
     "dev": "nodemon app.js",
+    "setup": "node seed.js",
     "seed": "node scripts/seed-tasks.js",
     "check": "node scripts/check-config.js",
     "seed-agenda": "node scripts/seed-agenda-data.js",
