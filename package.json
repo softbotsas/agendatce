@@ -1,17 +1,17 @@
 {
-  "name": "nominatce",
+  "name": "agenda-tce",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
     "start": "node app.js",
     "dev": "nodemon app.js",
     "setup": "node seed.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
+  "keywords": ["agenda", "tareas", "checklist", "nodejs", "express", "mongodb"],
+  "author": "Alejandro Botero - SoftBot SAS",
+  "license": "MIT",
+  "description": "Sistema de Agenda TCE - Checklist para Líderes con seguimiento de tareas, evidencias y KPIs",
   "dependencies": {
     "bcrypt": "^6.0.0",
     "compression": "^1.8.1",

@@ -264,13 +264,14 @@ Este proyecto está bajo la Licencia MIT - ver el archivo [LICENSE](LICENSE) par
 
 ## 👨‍💻 Autor
 
-**Yorman Salazar**
-- GitHub: [@elbernstein](https://github.com/elbernstein)
+**Alejandro Botero**
+- Empresa: SoftBot
+- GitHub: [@softbotsas](https://github.com/softbotsas)
 
 ---
 
 **⚠️ RECORDATORIO: Este es un Sistema de Agenda/Checklist, NO un sistema de nómina.**
 
-**📅 Última actualización**: Diciembre 2024
+**📅 Última actualización**: Septiembre 2025
 
 Desarrollado con ❤️ para el seguimiento eficiente de tareas operativas.
