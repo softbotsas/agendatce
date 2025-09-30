@@ -1,18 +1,34 @@
-# TCE Nómina Multinacional
+# Sistema de Agenda TCE - Checklist para Líderes
 
-Sistema de nómina multinacional desarrollado con Node.js, Express, Mongoose y EJS.
+**⚠️ IMPORTANTE: Este NO es un sistema de nómina. Es un sistema de agenda/checklist para el seguimiento de tareas diarias.**
 
-## 🚀 Características
+Sistema de checklist y seguimiento de tareas desarrollado con Node.js, Express, Mongoose y EJS para Laisa y Alejandra.
 
-- **Arquitectura modular**: Separación clara entre modelos, controladores, servicios y rutas
-- **Multi-país**: Soporte para diferentes sectores por país con sus propias reglas
-- **Multi-moneda**: Cada sector puede tener su moneda local
-- **Gestión de horarios**: Configuración flexible de turnos y horarios de trabajo
-- **Marcajes**: Sistema de registro de entrada y salida
-- **Timesheets**: Cálculo automático de horas trabajadas, extras y nocturnas
-- **Feriados**: Gestión de días festivos por sector
-- **Cálculo de nómina**: Generación automática de recibos de pago
-- **Reportes**: Visualización de períodos y recibos
+## 🎯 Objetivo del Sistema
+
+Este sistema permite a Laisa y Alejandra:
+- **Marcar tareas** (binarias ✅ o contables 🔢)
+- **Subir evidencias** (boletas, capturas, etc.)
+- **Registrar comentarios** sobre las tareas realizadas
+- **Seguir SLAs** (tiempos límite para completar tareas)
+- **Generar KPIs** de cumplimiento y productividad
+
+## 🚀 Características Principales
+
+### Vista Líder (Hoy)
+- **Tarjetas de tareas** con botones "Hecho" o "+1"
+- **Semáforo SLA** (🟢 Verde, 🟡 Amarillo, 🔴 Rojo)
+- **Evidencias obligatorias/opcionales** según la tarea
+- **Comentarios** en cada acción
+- **Progreso visual** para tareas contables
+
+### Vista Representante (Dashboard)
+- **% de cumplimiento** diario/semanal
+- **Metas vs. real** por período
+- **Tareas atrasadas** por SLA
+- **Filtros** por persona y fecha
+- **Exportación** a CSV/PDF
+- **KPIs del equipo** (Laisa y Alejandra)
 
 ## 🛠️ Tecnologías
 
@@ -20,38 +36,43 @@ Sistema de nómina multinacional desarrollado con Node.js, Express, Mongoose y E
 - **Base de datos**: MongoDB con Mongoose
 - **Vistas**: EJS con componentes parciales
 - **Sesiones**: Express-session con MongoDB Store
-- **Tiempo**: Moment.js con timezone support
-- **UI**: Bootstrap 5
+- **UI**: Bootstrap 5 + Font Awesome
+- **API**: RESTful endpoints
 
 ## 📁 Estructura del Proyecto
 
 ```
 src/
-├── models/nomina/          # Esquemas de MongoDB
-│   ├── Sector.js           # Sectores por país
-│   ├── Empleado.js         # Empleados
-│   ├── Contrato.js         # Contratos laborales
-│   ├── Horario.js          # Horarios de trabajo
-│   ├── Marcaje.js          # Registros de entrada/salida
-│   ├── TimesheetDia.js     # Resumen diario de horas
-│   ├── Feriado.js          # Días festivos
-│   ├── NominaPeriodo.js    # Períodos de nómina
-│   └── ReciboPago.js       # Recibos generados
-├── controllers/             # Controladores (lógica de negocio)
-├── services/nomina/         # Servicios (cálculos complejos)
-└── router/                  # Rutas de la aplicación
+├── models/agenda/                    # Esquemas de MongoDB
+│   ├── agenda.TaskDefinition.js     # Definiciones de tareas
+│   ├── agenda.TaskAssignment.js     # Asignaciones a usuarios
+│   ├── agenda.TaskLog.js           # Registros de actividades
+│   └── agenda.User.js              # Usuarios del sistema
+├── controllers/agenda/              # Controladores de agenda
+│   ├── agenda.configController.js
+│   ├── agenda.dashboardController.js
+│   ├── agenda.taskController.js
+│   └── agenda.taskManagementController.js
+├── services/agenda/                 # Servicios (KPIs, importación)
+│   ├── agenda.importService.js
+│   ├── agenda.kpiService.js
+│   └── agenda.taskService.js
+├── router/
+│   └── agenda.router.js             # Rutas de la agenda
+└── views/agenda/                    # Vistas EJS
+    └── agenda.index.ejs             # Vista principal
 
 views/
-├── templantes/              # Componentes EJS reutilizables
-└── nomina/                  # Vistas específicas de nómina
+├── templantes/                      # Componentes EJS reutilizables
+└── auth/                           # Vistas de autenticación
 ```
 
 ## 🚀 Instalación
 
 1. **Clonar el repositorio**
    ```bash
-   git clone https://github.com/elbernstein/nominatce.git
-   cd nominatce
+   git clone [tu-repositorio]
+   cd [nombre-del-proyecto]
    ```
 
 2. **Instalar dependencias**
@@ -61,7 +82,7 @@ views/
 
 3. **Configurar variables de entorno**
    ```bash
-   cp .env.example .env
+   cp env.example .env
    # Editar .env con tus configuraciones
    ```
 
@@ -71,63 +92,172 @@ views/
 
 5. **Ejecutar la aplicación**
    ```bash
-   node app.js
+   npm start
    ```
+
+6. **Acceder al sistema**
+   - URL: `http://localhost:3000/agenda/`
 
 ## 📋 Variables de Entorno
 
 ```env
-PORT=3033
-MONGODB_URI=mongodb://localhost:27017/nominatce
+PORT=3000
+MONGODB_URI=mongodb://localhost:27017/agenda_tce
 SECRET_KEY=tu-clave-secreta-aqui
 NODE_ENV=development
 ```
 
-## 🎯 Funcionalidades Principales
+## 🎯 Funcionalidades del Sistema
 
-### Gestión de Sectores
-- Crear sectores por país
-- Configurar reglas de horas y penalizaciones
-- Establecer moneda y zona horaria
+### Gestión de Tareas
+- **Crear tareas** con título, descripción, periodicidad
+- **Modos**: Binaria (Hecho/No hecho) o Contable (Contador)
+- **Periodicidad**: Diaria, semanal, mensual, lunes-jueves, quincenal
+- **SLAs**: Hora límite para completar tareas
+- **Evidencias**: Requerir o no archivos/capturas
+- **Etiquetas**: Categorización (RRHH, Comunicación, Rutas, etc.)
 
-### Empleados y Contratos
-- Registro de empleados
-- Gestión de contratos (por horas o mensual)
-- Asignación de horarios
+### Asignación de Tareas
+- **Generales**: Cualquier empleado puede realizarlas
+- **Específicas**: Asignadas a Laisa y/o Alejandra
+- **Flexibilidad**: Cambiar asignaciones dinámicamente
 
-### Cálculo de Nómina
-- Procesamiento automático de marcajes
-- Cálculo de horas normales, extras y nocturnas
-- Aplicación de penalizaciones (tardanzas, faltas)
-- Generación de recibos de pago
+### Seguimiento y KPIs
+- **Cumplimiento**: % de tareas completadas vs. total
+- **Puntualidad**: Tareas completadas dentro del SLA
+- **Productividad**: Número de acciones por día/semana
+- **Tendencias**: Comparación de rendimiento entre períodos
 
-### Reportes
-- Visualización de períodos de nómina
-- Consulta de recibos por empleado
-- Exportación de datos
+### Reportes y Exportación
+- **Dashboard en tiempo real** con métricas clave
+- **Filtros por fecha** y usuario
+- **Exportación CSV/PDF** de reportes
+- **Historial completo** de actividades
 
 ## 🔧 Desarrollo
 
-El proyecto sigue una arquitectura modular con separación clara de responsabilidades:
+El proyecto sigue una arquitectura modular con prefijos consistentes:
 
-- **Models**: Esquemas de MongoDB con validaciones
-- **Controllers**: Lógica de negocio y manejo de requests
-- **Services**: Cálculos complejos (como la calculadora de nómina)
-- **Router**: Definición de rutas y middleware
+- **Models**: `agenda.ModelName.js` - Esquemas de MongoDB
+- **Controllers**: `agenda.controllerName.js` - Lógica de negocio
+- **Services**: `agenda.serviceName.js` - Cálculos y procesamiento
+- **Router**: `agenda.router.js` - API RESTful
+- **Views**: `agenda.viewName.ejs` - Interfaz EJS
 
-## 📝 Notas de Implementación
+## 📊 Modelos de Datos
 
-- El cálculo de nocturnidad es simplificado (MVP)
-- Los impuestos y seguridad social están preparados para implementación futura
-- El sistema maneja múltiples zonas horarias correctamente
-- Los timesheets se generan automáticamente al calcular períodos
+### TaskDefinition
+```javascript
+{
+  title: String,           // "Revisar que todos los choferes estén en ruta"
+  description: String,     // Descripción detallada
+  mode: String,           // "binary" | "counter"
+  periodicity: String,    // "daily" | "weekly" | "monThu" | etc.
+  target_per_period: Number, // Meta para tareas contables
+  sla_time: String,       // "09:00" (hora límite)
+  requires_evidence: Boolean,
+  tags: [String]          // ["rutas", "comunicacion"]
+}
+```
+
+### TaskAssignment
+```javascript
+{
+  task_definition: ObjectId, // Referencia a TaskDefinition
+  user: ObjectId,           // Usuario asignado
+  activo: Boolean,          // Si está activa la asignación
+  start_date: Date,         // Fecha de inicio
+  end_date: Date           // Fecha de fin (opcional)
+}
+```
+
+### TaskLog
+```javascript
+{
+  task_assignment: ObjectId, // Referencia a TaskAssignment
+  user: ObjectId,           // Usuario que registró
+  action_type: String,      // "completed" | "increment"
+  value: Number,            // Valor registrado
+  comment: String,          // Comentario del usuario
+  evidence_files: [String], // Archivos adjuntos
+  log_date: Date           // Fecha y hora del registro
+}
+```
+
+## 🎯 Usuarios del Sistema
+
+- **Laisa Rodriguez**: Líder de operaciones
+- **Alejandra Martinez**: Coordinadora de equipos
+
+## 📝 Estado Actual del Proyecto (Diciembre 2024)
+
+### ✅ **SISTEMA FUNCIONAL Y ESTABLE**
+- **✅ Sistema de autenticación** completo y funcional
+- **✅ Login de usuarios** con selección de usuarios disponibles
+- **✅ Dashboard principal** con métricas en tiempo real
+- **✅ Gestión de tareas** (crear, editar, eliminar, completar)
+- **✅ Sistema de asignaciones** (generales y específicas)
+- **✅ Logging de actividades** (completar, incrementar, comentarios)
+- **✅ Historial completo** de actividades con filtros
+- **✅ Actividad reciente** en dashboard
+- **✅ Tareas del día** con filtrado por usuario
+- **✅ Tareas atrasadas** con gestión de SLAs
+- **✅ Sistema "No Aplica"** para tareas no realizables
+- **✅ Completado retroactivo** de tareas atrasadas
+- **✅ Subida de evidencias** con archivos adjuntos
+- **✅ Sistema de etiquetas** con categorías
+- **✅ Gestión de usuarios** completa
+- **✅ Base de datos** MongoDB con datos reales
+- **✅ APIs RESTful** completamente funcionales
+
+### 🔧 **Correcciones Recientes Aplicadas**
+- **✅ Problemas de login** resueltos (campos undefined)
+- **✅ Mapeo de usuarios** corregido (name vs nombre)
+- **✅ "Usuario eliminado"** en historial solucionado
+- **✅ Actividad reciente** con nombres correctos
+- **✅ Headers de usuario** mostrando nombres reales
+- **✅ Compatibilidad** entre frontend y backend
+
+### 🚀 **Funcionalidades Operativas**
+1. **Login seguro** con selección de usuarios
+2. **Dashboard interactivo** con KPIs en tiempo real
+3. **Gestión completa de tareas** (CRUD)
+4. **Seguimiento de SLAs** con colores indicativos
+5. **Evidencias y comentarios** en cada acción
+6. **Reportes y filtros** por fecha/usuario
+7. **Historial detallado** de todas las actividades
+8. **Sistema de notificaciones** visuales
+
+### 📋 **Próximas Mejoras**
+1. **Gráficos avanzados** en dashboard
+2. **Exportación PDF/Excel** de reportes
+3. **Notificaciones por email** de SLAs
+4. **Métricas de productividad** avanzadas
+5. **API de integración** con sistemas externos
+
+## 📚 Documentación Adicional
+
+### **📋 [PROGRESO_AGENDA.md](PROGRESO_AGENDA.md)**
+Documentación completa del progreso realizado, funcionalidades implementadas, problemas resueltos y tareas pendientes.
+
+### **🛠️ [GUIA_TECNICA.md](GUIA_TECNICA.md)**
+Guía técnica detallada con configuración del entorno, modelos de datos, APIs disponibles, debugging y solución de problemas.
+
+### **📚 [DOCUMENTACION_TECNICA_AGENDA.md](DOCUMENTACION_TECNICA_AGENDA.md)**
+Documentación técnica completa del sistema estable actual, incluyendo arquitectura, flujos de autenticación, servicios, APIs, problemas conocidos y mejores prácticas.
+
+### **🚨 [PROBLEMAS_RESUELTOS_Y_SOLUCIONES.md](PROBLEMAS_RESUELTOS_Y_SOLUCIONES.md)**
+Documentación detallada de todos los problemas críticos que se resolvieron, sus causas raíz, soluciones aplicadas y mejores prácticas para prevenir su recurrencia.
+
+### **⚡ [GUIA_RAPIDA_DESARROLLADOR.md](GUIA_RAPIDA_DESARROLLADOR.md)**
+Guía rápida para desarrolladores con comandos esenciales, checklist de desarrollo, patrones de código y soluciones a problemas comunes.
 
 ## 🤝 Contribuir
 
 1. Fork el proyecto
-2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
-3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
-4. Push a la rama (`git push origin feature/AmazingFeature`)
+2. Crea una rama para tu feature (`git checkout -b feature/NuevaFuncionalidad`)
+3. Commit tus cambios (`git commit -m 'Add NuevaFuncionalidad'`)
+4. Push a la rama (`git push origin feature/NuevaFuncionalidad`)
 5. Abre un Pull Request
 
 ## 📄 Licencia
@@ -141,4 +271,8 @@ Este proyecto está bajo la Licencia MIT - ver el archivo [LICENSE](LICENSE) par
 
 ---
 
-Desarrollado con ❤️ para la gestión de nóminas multinacionales.
+**⚠️ RECORDATORIO: Este es un Sistema de Agenda/Checklist, NO un sistema de nómina.**
+
+**📅 Última actualización**: Diciembre 2024
+
+Desarrollado con ❤️ para el seguimiento eficiente de tareas operativas.

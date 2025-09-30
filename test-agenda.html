@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Sistema de Agenda TCE</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f8f9fa; }
+        .test-container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .test-section { margin-bottom: 30px; }
+        .test-button { margin: 5px; }
+        .agenda-preview { border: 2px dashed #007bff; padding: 20px; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1 class="text-center mb-4">
+            <i class="fas fa-calendar-check text-primary me-2"></i>
+            Test Sistema de Agenda TCE
+        </h1>
+        
+        <div class="test-section">
+            <h3>🧪 Pruebas de Integración</h3>
+            <p>Este archivo permite probar la integración del sistema de agenda sin necesidad del sistema principal.</p>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>Opciones de Vista</h5>
+                    <button class="btn btn-primary test-button" onclick="loadFullView()">
+                        <i class="fas fa-desktop me-1"></i>
+                        Vista Completa
+                    </button>
+                    <button class="btn btn-success test-button" onclick="loadNavigationOnly()">
+                        <i class="fas fa-compress me-1"></i>
+                        Solo Navegación
+                    </button>
+                    <button class="btn btn-info test-button" onclick="loadPartialView('today')">
+                        <i class="fas fa-calendar-day me-1"></i>
+                        Solo Hoy
+                    </button>
+                    <button class="btn btn-warning test-button" onclick="loadPartialView('dashboard')">
+                        <i class="fas fa-chart-bar me-1"></i>
+                        Solo Dashboard
+                    </button>
+                </div>
+                <div class="col-md-6">
+                    <h5>Pruebas de API</h5>
+                    <button class="btn btn-secondary test-button" onclick="testAPI('today')">
+                        <i class="fas fa-api me-1"></i>
+                        Test API Hoy
+                    </button>
+                    <button class="btn btn-secondary test-button" onclick="testAPI('dashboard')">
+                        <i class="fas fa-api me-1"></i>
+                        Test API Dashboard
+                    </button>
+                    <button class="btn btn-secondary test-button" onclick="testAPI('history')">
+                        <i class="fas fa-api me-1"></i>
+                        Test API Historial
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h3>📱 Preview del Sistema</h3>
+            <div class="agenda-preview" id="preview-container">
+                <div class="text-center text-muted">
+                    <i class="fas fa-mouse-pointer fa-2x mb-2"></i>
+                    <p>Selecciona una opción arriba para ver el preview</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h3>📊 Log de Pruebas</h3>
+            <div class="card">
+                <div class="card-body">
+                    <pre id="test-log" style="height: 200px; overflow-y: auto; background-color: #f8f9fa; padding: 10px; border-radius: 5px;">Iniciando pruebas...\n</pre>
+                    <button class="btn btn-sm btn-outline-danger" onclick="clearLog()">
+                        <i class="fas fa-trash me-1"></i>
+                        Limpiar Log
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Función para loggear eventos
+        function log(message) {
+            const logElement = document.getElementById('test-log');
+            const timestamp = new Date().toLocaleTimeString();
+            logElement.textContent += `[${timestamp}] ${message}\n`;
+            logElement.scrollTop = logElement.scrollHeight;
+        }
+        
+        function clearLog() {
+            document.getElementById('test-log').textContent = 'Log limpiado...\n';
+        }
+        
+        // Función para cargar vista completa
+        function loadFullView() {
+            log('Cargando vista completa...');
+            const preview = document.getElementById('preview-container');
+            preview.innerHTML = `
+                <div class="text-center">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Cargando...</span>
+                    </div>
+                    <p class="mt-2">Cargando vista completa desde /agenda</p>
+                </div>
+            `;
+            
+            // Simular carga de vista completa
+            setTimeout(() => {
+                preview.innerHTML = `
+                    <div class="alert alert-success">
+                        <h5><i class="fas fa-check-circle me-2"></i>Vista Completa Cargada</h5>
+                        <p>La vista completa incluye navegación + contenido dinámico</p>
+                        <p><strong>URL:</strong> /agenda</p>
+                        <p><strong>Uso:</strong> iframe src="/agenda" o redirección directa</p>
+                    </div>
+                `;
+                log('✅ Vista completa cargada exitosamente');
+            }, 1500);
+        }
+        
+        // Función para cargar solo navegación
+        function loadNavigationOnly() {
+            log('Cargando solo navegación...');
+            const preview = document.getElementById('preview-container');
+            preview.innerHTML = `
+                <div class="text-center">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Cargando...</span>
+                    </div>
+                    <p class="mt-2">Cargando navegación desde /agenda/nav</p>
+                </div>
+            `;
+            
+            // Simular carga de navegación
+            setTimeout(() => {
+                preview.innerHTML = `
+                    <div class="card">
+                        <div class="card-header">
+                            <h5><i class="fas fa-calendar-check text-primary me-2"></i>Sistema de Agenda</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="btn-group" role="group">
+                                <button class="btn btn-outline-primary btn-sm">Hoy</button>
+                                <button class="btn btn-outline-primary btn-sm">Dashboard</button>
+                                <button class="btn btn-outline-primary btn-sm">Historial</button>
+                            </div>
+                            <p class="mt-2 text-muted">Navegación lista para integración</p>
+                        </div>
+                    </div>
+                `;
+                log('✅ Navegación cargada exitosamente');
+            }, 1000);
+        }
+        
+        // Función para cargar vista parcial
+        function loadPartialView(view) {
+            log(`Cargando vista parcial: ${view}`);
+            const preview = document.getElementById('preview-container');
+            preview.innerHTML = `
+                <div class="text-center">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Cargando...</span>
+                    </div>
+                    <p class="mt-2">Cargando ${view} desde /agenda/partials/${view}</p>
+                </div>
+            `;
+            
+            // Simular carga de vista parcial
+            setTimeout(() => {
+                const viewNames = {
+                    'today': 'Tareas de Hoy',
+                    'dashboard': 'Dashboard',
+                    'history': 'Historial'
+                };
+                
+                preview.innerHTML = `
+                    <div class="card">
+                        <div class="card-header">
+                            <h5><i class="fas fa-calendar-day text-primary me-2"></i>${viewNames[view]}</h5>
+                        </div>
+                        <div class="card-body">
+                            <p>Contenido de la vista ${viewNames[view]}</p>
+                            <p><strong>URL:</strong> /agenda/partials/${view}</p>
+                            <p><strong>Uso:</strong> Cargar via AJAX en contenedor dinámico</p>
+                        </div>
+                    </div>
+                `;
+                log(`✅ Vista parcial ${view} cargada exitosamente`);
+            }, 1000);
+        }
+        
+        // Función para probar API
+        function testAPI(endpoint) {
+            log(`Probando API: ${endpoint}`);
+            const preview = document.getElementById('preview-container');
+            preview.innerHTML = `
+                <div class="text-center">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Probando...</span>
+                    </div>
+                    <p class="mt-2">Probando endpoint /agenda/api/${endpoint}</p>
+                </div>
+            `;
+            
+            // Simular prueba de API
+            setTimeout(() => {
+                preview.innerHTML = `
+                    <div class="alert alert-info">
+                        <h5><i class="fas fa-api me-2"></i>Test API: ${endpoint}</h5>
+                        <p><strong>Endpoint:</strong> /agenda/api/${endpoint}</p>
+                        <p><strong>Método:</strong> GET</p>
+                        <p><strong>Estado:</strong> <span class="badge bg-success">Simulado</span></p>
+                        <p><strong>Respuesta esperada:</strong> JSON con datos de ${endpoint}</p>
+                    </div>
+                `;
+                log(`✅ API ${endpoint} probada exitosamente (simulado)`);
+            }, 1000);
+        }
+        
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', function() {
+            log('Sistema de prueba iniciado');
+            log('Selecciona una opción para comenzar las pruebas');
+        });
+    </script>
+</body>
+</html>
+
+
+

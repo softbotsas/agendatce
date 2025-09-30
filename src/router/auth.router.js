@@ -1,6 +1,6 @@
 // router/auth.router.js
 const router = require('express').Router();
-const auth = require('../controlls/auth.controller');
+const auth = require('../controllers/auth.controller');
 
 // Rutas públicas
 router.get('/auth/login', auth.viewLogin);

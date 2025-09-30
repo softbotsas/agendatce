@@ -2,11 +2,8 @@ const MongoStore = require('connect-mongo');
 const mongoose = require('mongoose');
 require('dotenv').config();
 
-// Configura tu URI de conexión a MongoDB
-const password = "r7ogqjJ7XyULgrZY";
-const usuario = "bernstein";
-const bd = "tucajaex";
-const uri = `mongodb+srv://${usuario}:${password}@cluster0.ui39vqd.mongodb.net/${bd}?retryWrites=true&w=majority&appName=Cluster0`;
+// Configuración para MongoDB local
+const uri = process.env.MONGODB_URI || 'mongodb://localhost:27017/agenda_tce';
 
 // Opciones de conexión
 const options = {
@@ -18,8 +15,8 @@ const options = {
 // Conecta a MongoDB si no está conectado ya
 if (mongoose.connection.readyState === 0) {
   mongoose.connect(uri, options)
-    .then(() => console.log('Conexión exitosa a MongoDB para sesiones'))
-    .catch(err => console.error('Error de conexión a MongoDB para sesiones:', err));
+    .then(() => console.log('✅ Conexión exitosa a MongoDB local para sesiones'))
+    .catch(err => console.error('❌ Error de conexión a MongoDB local para sesiones:', err));
 }
 
 // Crea el almacén de sesiones

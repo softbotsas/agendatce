@@ -19,11 +19,15 @@ const sessionStore = require('./sessionStore');
 
 // Vistas y estáticos (importante usando __dirname de raíz)
 app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, 'views'));
+app.set('views', path.join(__dirname, 'src/views'));
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Middlewares
-app.use(cors());
+app.use(cors({
+  origin: true,
+  credentials: true
+}));
 app.use(methodOverride('_method'));
 app.use(morgan('dev'));
 app.use(compression());
@@ -57,7 +61,7 @@ app.use((req, res, next) => { req.io = io; next(); });
 
 // Rutas (ajusta si tus carpetas están en raíz)
 app.use('/', require('./src/router/auth.router')); 
-app.use('/', require('./src/router/nomina.router')); 
+app.use('/', require('./src/router/agenda.router')); 
 app.get('/', (req,res)=> res.render('home', { titulo: 'Inicio' }));
 
 // Socket.io

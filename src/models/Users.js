@@ -38,6 +38,18 @@ const UserSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: 'Agencia'
   },
+  // Relación con el sistema de agenda
+  agenda_user: {
+    type: Schema.Types.ObjectId,
+    ref: 'agenda.User',
+    default: null
+  },
+  // Información específica para agenda
+  agenda_info: {
+    nombre_agenda: { type: String, trim: true },
+    color: { type: String, default: '#007bff' },
+    activo_agenda: { type: Boolean, default: true }
+  },
   activo: { type: Boolean, default: true }
 }, {
   timestamps: true
